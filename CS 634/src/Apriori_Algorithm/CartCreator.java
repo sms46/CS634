@@ -38,8 +38,7 @@ public class CartCreator {
 	}
 	
 	
-	private static String[] GetStringArray(ArrayList<String> arr) 
-    { 
+	private static String[] GetStringArray(ArrayList<String> arr) { 
   
         // declaration and initialise String Array 
         String str[] = new String[arr.size()]; 

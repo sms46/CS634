@@ -51,9 +51,7 @@ public class Apriori {
 			k_1.clear();
 			k_1.addAll(getFequentitems(cKItemset));
 			lk.addAll(k_1);
-			
-//			cKItemset = aprioriGen(k_1);
-//			k_1.addAll(getFequentitems(cKItemset));		
+
 			
 		}
 
