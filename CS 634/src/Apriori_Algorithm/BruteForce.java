@@ -4,8 +4,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Set;
 
 import com.opencsv.CSVReader;
@@ -19,8 +21,23 @@ public class BruteForce {
 	private static List<List<String>> lk = new ArrayList<List<String>>();
 	private static java.util.Map<List<String>, Float> supportCount = new java.util.HashMap<List<String>, Float>();
 	private static int totalTrans;
+	private static int totalFeqChecks;
 
 	public static void main(String[] args) throws CsvValidationException, IOException {
+		Scanner input = new Scanner(System.in);
+		System.out.print("What is the minimum support(%)? ");
+		minSup = input.nextInt();
+		System.out.print("What is the minimum confidence(%)? ");
+		minConf = input.nextInt();
+		input.close();
+		long start = new Date().getTime();
+		start();
+		long totalRunTime = new Date().getTime() - start;
+		System.out.printf("%nMilliseconds: %d", totalRunTime);
+		System.out.printf("%nFrequency Checks: %d", totalFeqChecks);
+	}
+	
+	private static void start() throws CsvValidationException, IOException {
 		List<List<String>> k_1 = new ArrayList<List<String>>();
 		List<List<String>> cKItemset = new ArrayList<List<String>>();		
 		CSVReader reader = new CSVReader(new FileReader("G:\\My Drive\\School\\Grad\\CS 634\\Midterm Project\\cart1.csv"));
@@ -36,8 +53,7 @@ public class BruteForce {
 		k_1.addAll(getFequentitems(itemset1));
 		
 		int k = 2;
-		while (true) {
-			
+		while (true) {			
 			k_1.addAll(getktimeSet(itemset1, k));
 			cKItemset = getFequentitems(k_1);
 			if (cKItemset.isEmpty()) {
@@ -48,9 +64,8 @@ public class BruteForce {
 			k++;
 		}
 		
-		getAssocRules();
-	}
-	
+		getAssocRules();		
+	}	
 	
 	private static List<List<String>> getktimeSet(List<List<String>> itemset1, int k) {
 		
@@ -74,12 +89,10 @@ public class BruteForce {
 		        }
 		        subsets.add(getSubset(itemset1, s));
 		    }
-		    //System.out.println(subsets.toString());
-		    System.out.println(subsets.size());
 		}				
 		return subsets;
-	}
-	
+	}	
+
 	private static List<String> getSubset(List<List<String>> input, int[] subset) {
 		List<String> result = new ArrayList<String>(); 
 	    for (int i = 0; i < subset.length; i++) 
@@ -90,6 +103,7 @@ public class BruteForce {
 	private static List<List<String>> getFequentitems(List<List<String>> canidates) {
 		java.util.Map<List<String>, Integer> map = new java.util.HashMap<List<String>, Integer>();
 		for (List<String> i: canidates) {
+			totalFeqChecks++;
 			float count = 0; 
 			for (int n = 0; n < trans.size(); n++) {
 				if (!trans.get(n).containsAll(i)) {
@@ -138,14 +152,12 @@ public class BruteForce {
 			holder.add(i); 
 			helperList.add(holder);
 		}
-		
-//		String[] helperList = map.keySet().toArray(new String[map.keySet().size()]);
-//		//System.out.println(map.keySet());
 		return helperList;
 	}
 	
 	private static void getAssocRules() {
 		System.out.printf("%nMinimum Support: %d%%%nMinimum Confidence: %d%%%n%nAssociation Rules%n%n", minSup, minConf);
+		List<String> tested = new ArrayList<String>();
 		for (List<String> e: lk) {
 			Set<List<String>> subSet = new LinkedHashSet<List<String>>();
 			for (int i = 0; i < (1<<e.size()); i++) {
@@ -158,11 +170,24 @@ public class BruteForce {
 				}
 			}
 			List<List<String>> helper = new ArrayList<List<String>>(subSet);
-			//System.out.println(helper.toString());
+			//System.out.println(helper.toString());			
+			String temp2 = null;
 			for (int x = 0; x < helper.size(); x++) {
-				for(int y = x + 1; y < helper.size(); y++) {
+				skip:
+				for(int y = 0; y < helper.size(); y++) {
+					temp2 = helper.get(x).toString() + helper.get(y).toString();
+					//System.out.println(tested.contains(temp));
 					if((helper.get(x).size() + helper.get(y).size() < helper.size()) && 
-							!(helper.get(x).containsAll(helper.get(y)) || helper.get(y).containsAll(helper.get(x)))) {
+							!(helper.get(x).containsAll(helper.get(y)) || helper.get(y).containsAll(helper.get(x))) && 
+							!tested.contains(temp2)) {
+						for (String tester: helper.get(x)) {
+							if (helper.get(y).contains(tester)) {
+								//System.out.print("continue");;
+								continue skip;
+							}
+							
+						}
+						
 						float countXY = 0;
 						for (List<String> order: trans) {
 							if (order.containsAll(helper.get(x)) && order.containsAll(helper.get(y))) {
@@ -174,14 +199,16 @@ public class BruteForce {
 						
 						Float a = supportCount.get(helper.get(x));
 						Float confidence = (countXY / a) * 100;
-						//System.out.printf("helper size: %d%n%s:%f%n%s:%f%n%s => %s: %f%%%n", helper.size(), m, a, n, countXY, m, n, confidence);
-						if (confidence > minConf) {
+						
+						//System.out.printf("%s => %s: %.2f%%%n",  m, n, confidence);
+						if (confidence >= minConf) {
+							//System.out.printf("helper size: %d%n%s:%f%n%s:%f%n%s => %s: %.2f%%%n", helper.size(), m, a, n, countXY, m, n, confidence);
 							System.out.printf("%s => %s: %.2f%%%n",  m, n, confidence);
+							tested.add(temp2);
 						}
 					}
 				}
 			}
 		}
 	}
-
 }
