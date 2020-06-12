@@ -6,23 +6,28 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Scanner;
 import java.util.List;
 import java.util.Set;
 
 import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvException;
 //import org.apache.
 import com.opencsv.exceptions.CsvValidationException;
 
 public class Apriori {
-	private static int minSup = 50;
-	private static int minConf = 70;
+	private static int minSup = 0;
+	private static int minConf = 0;
 	private static List<List<String>> trans = new ArrayList<List<String>>();
 	private static List<List<String>> lk = new ArrayList<List<String>>();
 	private static java.util.Map<List<String>, Float> supportCount = new java.util.HashMap<List<String>, Float>();
 	private static int totalTrans;
 
-	public static void main(String[] args) throws CsvValidationException, IOException {		
+	public static void main(String[] args) throws CsvValidationException, IOException {
+		Scanner input = new Scanner(System.in);
+		System.out.print("What is the minimum support(%)? ");
+		minSup = input.nextInt();
+		System.out.print("What is the minimum confidence(%)? ");
+		minConf = input.nextInt();
 		start();
 	}
 	
@@ -36,8 +41,7 @@ public class Apriori {
 		reader.close();
 		
 		List<List<String>> k_1 = new ArrayList<List<String>>();
-		List<List<String>> cKItemset = new ArrayList<List<String>>();
-		
+		List<List<String>> cKItemset = new ArrayList<List<String>>();		
 		
 		k_1.addAll(get1Itemsets());
 		//System.out.println(k_1.toString());
@@ -50,9 +54,7 @@ public class Apriori {
 			
 			k_1.clear();
 			k_1.addAll(getFequentitems(cKItemset));
-			lk.addAll(k_1);
-
-			
+			lk.addAll(k_1);			
 		}
 
 		//System.out.println(lk.toString());
@@ -69,8 +71,6 @@ public class Apriori {
 					Set<String> temp = new LinkedHashSet<>(l1);
 					temp.addAll(l2);
 					List<String> tempList = new ArrayList<>(temp);
-//					tempList.addAll(l1);			
-//					tempList.addAll(l2);
 					Collections.sort(tempList);
 					if ((tempList.size() == l1.size() + 1) && !hasInfrequentSubset(tempList, list)) {
 						cItemset.add(tempList);
@@ -90,12 +90,10 @@ public class Apriori {
 				}
 				float count = 0; 
 				for (int n = 0; n < trans.size(); n++) {
-					//System.out.println(trans.get(n).contains(i));
 					if (!trans.get(n).contains(i)) {
 						continue;
 					}
 					else {
-						//System.out.printf("n=%d%ns=%s%n", n, i);
 						count++;
 					}					
 				}
@@ -107,7 +105,6 @@ public class Apriori {
 				}
 			}
 		}
-		//System.out.printf("%s%n", map.toString());
 		List<List<String>> helperList = new ArrayList<List<String>>();
 		for (String i : map.keySet()) {
 			List<String> holder = new ArrayList<String>();
@@ -147,7 +144,6 @@ public class Apriori {
 		for (List<String> i: canidates) {
 			float count = 0; 
 			for (int n = 0; n < trans.size(); n++) {
-				//System.out.println(trans.get(n).contains(i));
 				if (!trans.get(n).containsAll(i)) {
 					continue;
 				}
@@ -162,18 +158,16 @@ public class Apriori {
 			}
 		}
 		
-		//System.out.println(map.toString());
 		List<List<String>> helperList = new ArrayList<List<String>>();
 		for (List<String> i : map.keySet()) {
 			helperList.add(i); 
-			//lk.add(helperList);
 		}		
 		return helperList;
 	}
 	
 	//Generates Association rules by using 
 	private static void getAssocRules() {
-		System.out.printf("Minimum Support: %d%%%nMinimum Confidence: %d%%%n%nAssociation Rules%n%n", minSup, minConf);
+		System.out.printf("%nMinimum Support: %d%%%nMinimum Confidence: %d%%%n%nAssociation Rules%n%n", minSup, minConf);
 		for (List<String> e: lk) {
 			Set<List<String>> subSet = new LinkedHashSet<List<String>>();
 			for (int i = 0; i < (1<<e.size()); i++) {
@@ -184,7 +178,6 @@ public class Apriori {
 						subSet.add(temp);
 					}
 				}
-				//System.out.print("} \n");
 			}
 			List<List<String>> helper = new ArrayList<List<String>>(subSet);
 			//System.out.println(helper.toString());
