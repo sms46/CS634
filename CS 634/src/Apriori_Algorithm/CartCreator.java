@@ -11,36 +11,37 @@ import com.opencsv.CSVWriter;
 public class CartCreator {
 
 	public static void main(String[] args) throws IOException {
-		String items[] = {"Diapers", "Rice", "Tomatoes", "Pasta", "Juice", "Eggs", "Milk", "Bread", "Bagels", "Cheese",
-				"Butter", "Soda", "Lotion", "Perfume", "Books", "Pens", "Pencils", "Notebook", "Onion", "Mask", "Paper Toilets",
-				"Toilet Paper", "Pants", "Shirts", "Cell Phone", "Plates", "Chairs", "Cups", "Spoon", "Knifes"};
 		
-		CSVWriter writer = new CSVWriter(new FileWriter("G:\\My Drive\\School\\Grad\\CS 634\\Midterm Project\\cart1.csv"));
-
-		for (int x = 0; x < 20; x++) {
-			System.out.print( x + " ");
-			ArrayList<String> order = new ArrayList<String>();
-			for (int y = 0; y < items.length; y++) {		
-				Random randGet = new Random();
-				double rand = randGet.nextDouble();
-				//System.out.printf("%f%n", rand);
-				if (randGet.nextDouble() <= 0.3 ) {
-					order.add(items[y]);
-					System.out.printf("%s ", items[y]);
+		for (int m = 0; m < 4; m++) {
+			String items[] = {"Diapers", "Rice", "Tomatoes", "Pasta", "Juice", "Eggs", "Milk", "Bread", "Bagels", "Cheese",
+					"Butter", "Soda", "Lotion", "Perfume", "Books", "Pens", "Pencils", "Notebook", "Onion", "Mask", "Paper Toilets",
+					"Toilet Paper", "Pants", "Shirts", "Cell Phone", "Plates", "Chairs", "Cups", "Spoon", "Knives"};
+			
+			CSVWriter writer = new CSVWriter(new FileWriter("G:\\My Drive\\School\\Grad\\CS 634\\Midterm Project\\cart" + (m + 1) + ".csv"));
+	
+			for (int x = 0; x < 20; x++) {
+				//System.out.print( x + " ");
+				ArrayList<String> order = new ArrayList<String>();
+				for (int y = 0; y < items.length; y++) {		
+					Random randGet = new Random();
+					double rand = randGet.nextDouble();
+					if (randGet.nextDouble() <= 0.3 ) {
+						order.add(items[y]);
+						//System.out.printf("%s ", items[y]);
+					}
 				}
-			}
-			order.trimToSize();
-			System.out.printf("%n");
-			writer.writeNext(GetStringArray(order));
+				order.trimToSize();
+				//System.out.printf("%n");
+				writer.writeNext(GetStringArray(order));
+			}			
+		     writer.close();
 		}
-		
-	     writer.close();
 	}
 	
 	
 	private static String[] GetStringArray(ArrayList<String> arr) { 
   
-        // declaration and initialise String Array 
+        // declaration and initialize String Array 
         String str[] = new String[arr.size()]; 
   
         // Convert ArrayList to object array 
